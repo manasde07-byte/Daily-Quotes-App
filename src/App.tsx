@@ -57,9 +57,13 @@ export default function App() {
       console.log('Tracking status:', trackingInfo.status);
 
       // Prepare Interstitial early
+      // Ad Unit IDs can be changed in .env or modified here
+      const interstitialId = process.env.VITE_ADMOB_INTERSTITIAL_ID || 'ca-app-pub-2044603074826844/7772005466';
+      const bannerId = process.env.VITE_ADMOB_BANNER_ID || 'ca-app-pub-2044603074826844/3668941057';
+
       try {
         await AdMob.prepareInterstitial({
-          adId: 'ca-app-pub-2044603074826844/7772005466', // Real Interstitial ID
+          adId: interstitialId,
           isTesting: false
         });
         console.log('Interstitial prepared');
@@ -71,11 +75,11 @@ export default function App() {
       setTimeout(async () => {
         try {
           await AdMob.showBanner({
-            adId: 'ca-app-pub-2044603074826844/3668941057', // Real Banner ID
+            adId: bannerId,
             adSize: BannerAdSize.ADAPTIVE_BANNER,
             position: BannerAdPosition.BOTTOM_CENTER,
             margin: 0,
-            isTesting: false // Set to true for testing, false for production
+            isTesting: false 
           });
           console.log('Banner displayed successfully');
         } catch (bannerError) {
@@ -91,20 +95,22 @@ export default function App() {
   const showInterstitial = async () => {
     if (!Capacitor.isNativePlatform()) return;
     
+    const adId = process.env.VITE_ADMOB_INTERSTITIAL_ID || 'ca-app-pub-2044603074826844/7772005466';
+
     try {
       // First try to show
       await AdMob.showInterstitial();
       
       // After showing, prepare the next one
       await AdMob.prepareInterstitial({
-        adId: 'ca-app-pub-2044603074826844/7772005466',
+        adId,
         isTesting: false
       });
     } catch (e) {
       console.log('Interstitial not ready or failed, trying to prepare...', e);
       try {
         await AdMob.prepareInterstitial({
-          adId: 'ca-app-pub-2044603074826844/7772005466',
+          adId,
           isTesting: false
         });
         await AdMob.showInterstitial();
